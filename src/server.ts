@@ -11,7 +11,7 @@ app.get('/', (req :Request,res : Response)=> {
 })
 
 app.post ('/', (req :Request,res : Response)=> {
-  console.log(req);
+  console.log(req.body);
   res.status(201).json({
     success: true,
     message: "Data received successfully"
