@@ -31,10 +31,6 @@ testDBConnection();
 
 
 
-
-
-
-
 // Middleware to parse JSON bodies
 app.use(express.json());
 
@@ -43,13 +39,39 @@ app.get('/', (req :Request,res : Response)=> {
   res.send('Hello Web Server!')
 })
 
-app.post ('/', (req :Request,res : Response)=> {
-  console.log(req.body);
-  res.status(201).json({
-    success: true,
-    message: "Data received successfully"
+app.post ('/users', (req :Request,res : Response)=> {
+
+const {name, age, email, address} = req.body;
+
+const result = pool.query(
+  'INSERT INTO users (name, age, email, address) VALUES ($1, $2, $3, $4) RETURNING *',
+  [name, age, email, address],
+  (error, results) => {   
+    try {
+      res.status(201).json(
+        {success: true,
+        message: "User added successfully",
+        data: results.rows[0]
+        
+      }
+      );
+console.log(results.rows);
+      }
+     
+     catch (error:any) {
+      //res.status(500).json
+      ({
+        success: false,
+        message: 'Error inserting user'
+       });
+
+      console.error('Error inserting user:', error);
+    }
+  }
+)
+  
   })
-})
+
 
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`)
