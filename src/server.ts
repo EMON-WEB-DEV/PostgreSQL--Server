@@ -2,7 +2,7 @@ import express, { Request, Response } from "express"
 import {Pool} from "pg"
 import dotenv from "dotenv"
 import path from "path";
-import { get } from "http";
+
 
 dotenv.config({path:path.join(process.cwd() , '.env')});
 
