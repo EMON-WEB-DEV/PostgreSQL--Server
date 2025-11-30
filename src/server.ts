@@ -119,6 +119,62 @@ app.get('/users/:id', async (req: Request, res: Response) => {
   }
 });
 
+// Endpoint to update a user by ID
+app.put('/users/:id', async (req: Request, res: Response) => { 
+  const userId = req.params.id;
+  const { name, age, email, address } = req.body;
+  try {
+    const updateUser = await pool.query(
+      'UPDATE users SET name = $1, age = $2, email = $3, address = $4, updated_at = CURRENT_TIMESTAMP WHERE id = $5 RETURNING *',
+      [name, age, email, address, userId]
+    );
+    if (updateUser.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found'
+      });
+    }
+    res.status(200).json({
+      success: true,
+      message: 'User updated successfully',
+      data: updateUser.rows[0]
+    });
+    console.log(updateUser.rows[0]);
+  } catch (error: any) {
+    res.status(500).json({
+      success: false,
+      message: 'Error updating user'
+    });
+    console.error('Error updating user:', error.message);
+  }
+});
+
+// Endpoint to delete a user by ID
+app.delete('/users/:id', async (req: Request, res: Response) => {
+  const userId = req.params.id;
+  try {
+    const deleteUser = await pool.query('DELETE FROM users WHERE id = $1 RETURNING *', [userId]);
+    if (deleteUser.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found'
+      });
+    }
+    res.status(200).json({
+      success: true,
+      message: 'User deleted successfully',
+      data: deleteUser.rows[0]
+    });
+    console.log(deleteUser.rows[0]);
+  } catch (error: any) {
+    res.status(500).json({
+      success: false,
+      message: 'Error deleting user'
+    });
+    console.error('Error deleting user:', error.message);
+  }
+});
+
 // Start the server
 
 app.listen(port, () => {
